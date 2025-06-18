@@ -12,7 +12,7 @@ export class Dungeon {
     height: number = 1;
     cells: number[] = [];
     startPosition: Vector;
-    rayCastIncrement = 0.1;
+    rayCastIncrement = 0.02;
     rayCastMaxDistance = 10;
 
     constructor(properties?: DungeonProperties) {

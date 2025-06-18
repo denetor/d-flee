@@ -1,4 +1,4 @@
-import {Actor, Color, Engine, Keys, Line, Scene, vec, Vector} from "excalibur";
+import {Actor, Canvas, Color, Engine, Keys, Line, Scene, vec, Vector} from "excalibur";
 import {DungeonFactory} from "@/factories/dungeon.factory";
 import {Dungeon} from "@/models/dungeon.model";
 import {Player} from "@/models/player.model";
@@ -7,9 +7,12 @@ export class CrawlScene extends Scene {
     dungeon: Dungeon;
     player: Player;
     // field of view width (in radians)
-    fov: number = 90 * Math.PI / 180;
+    fov: number = 60 * Math.PI / 180;
     // single FOV increment to span for each frame width pixel
     fovStep: number = 0;
+    // rendering type
+    renderingType: 'exActors' | 'exCanvas' = 'exCanvas';
+    exCanvas: Canvas = null as any;
 
 
     constructor() {
@@ -17,28 +20,46 @@ export class CrawlScene extends Scene {
         this.dungeon = DungeonFactory.getTestDungeon();
         this.player = new Player();
         this.player.position = this.dungeon.startPosition;
-        this.player.direction = 45 * Math.PI / 180; // in degrees
+        this.player.direction = -60 * Math.PI / 180; // in degrees
     }
 
 
     onInitialize(engine: Engine) {
         super.onInitialize(engine);
         this.fovStep = this.fov / engine.drawWidth;
+
+        if (this.renderingType === 'exCanvas') {
+            this.exCanvas = new Canvas({
+                height: engine.drawHeight,
+                width: engine.drawWidth,
+                // cache: true,
+                draw: this.renderCanvas.bind(this),
+            });
+            const canvasActor = new Actor({
+                pos: engine.screen.center,
+            });
+            canvasActor.graphics.use(this.exCanvas);
+            engine.add(canvasActor);
+        }
     }
 
 
     onPreUpdate(engine: Engine, elapsed: number) {
         super.onPreUpdate(engine, elapsed);
-        this.render(engine);
+        if (this.renderingType === 'exActors') {
+            this.renderActors(engine);
+        }
     }
 
 
     onPostUpdate(engine: Engine, elapsed: number) {
         super.onPostUpdate(engine, elapsed);
 
-        // kill all actors, they will be rebuilt
-        for (const a of this.actors) {
-            a.kill();
+        if (this.renderingType === 'exActors') {
+            // kill all actors, they will be rebuilt
+            for (const a of this.actors) {
+                a.kill();
+            }
         }
 
         // manage key presses
@@ -49,25 +70,80 @@ export class CrawlScene extends Scene {
             this.movePlayer(-0.1);
         }
         if (engine.input.keyboard.isHeld(Keys.A)) {
-            this.rotatePlayer(-1);
+            this.rotatePlayer(-2.5);
         }
         if (engine.input.keyboard.isHeld(Keys.D)) {
-            this.rotatePlayer(1);
+            this.rotatePlayer(2.5);
         }
     }
+
+
+    renderCanvas(ctx: CanvasRenderingContext2D) {
+        this.drawBackgroundCanvas(ctx);
+        this.drawWallsCanvas(ctx);
+    }
+
+
+    drawWallsCanvas(ctx: CanvasRenderingContext2D) {
+        console.log('renderCanvas()');
+        // calculate starting angle (direction - half the FOV)
+        let rayDirection = this.player.direction - this.fov / 2;
+        // cast a ray for each viewport pixel
+        for (let x = 0; x < ctx.canvas.width; x++) {
+            // cast ray to find distance to wall
+            let d = this.dungeon.castRay(this.player.position, rayDirection);
+            // calculate wall height basing on distance
+            let wallHeight = this.getWallHeight(ctx.canvas.height, d);
+            // TODO correct FOV distortion
+            const wallShade = this.getWallColor(d);
+            // draw wall
+            ctx.strokeStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+            ctx.beginPath();
+            ctx.moveTo(x, ctx.canvas.height / 2 - wallHeight / 2);
+            ctx.lineTo(x, ctx.canvas.height / 2 + wallHeight / 2);
+            ctx.stroke();
+            // increment ray direction for next pixel
+            rayDirection += this.fovStep;
+        }
+    }
+
+
+    /**
+     * Draws the background on the provided canvas rendering context. The background consists of
+     * two sections: the upper half representing the sky, and the lower half representing a pavement.
+     *
+     * @param {CanvasRenderingContext2D} ctx - The 2D rendering context of the canvas on which the background is drawn.
+     * @return {void} No return value. The background is drawn directly on the canvas context.
+     */
+    drawBackgroundCanvas(ctx: CanvasRenderingContext2D): void {
+        // upper half: sky
+        ctx.fillStyle = "#87CEFA";
+        ctx.fillRect(0, 0, ctx.canvas.width - 1, ctx.canvas.height / 2 - 1);
+        // lower half: pavement
+        ctx.fillStyle = "#555555";
+        ctx.fillRect(0, ctx.canvas.height / 2, ctx.canvas.width - 1, ctx.canvas.height);
+    }
+
+
+
 
 
     /**
      * Version 1: no optimizations, render via an actor for each vertical line
      * @param engine
      */
-    render(engine: Engine) {
-        this.drawBackground(engine);
-        this.drawWalls(engine);
+    renderActors(engine: Engine) {
+        this.drawBackgroundActors(engine);
+        this.drawWallsActors(engine);
     }
 
 
-    drawWalls(engine: Engine) {
+    /**
+     * Draw walls using raycasting to generate an actor for each vertical line
+     *
+     * @param engine
+     */
+    drawWallsActors(engine: Engine) {
         // calculate starting angle (direction - half the FOV)
         let rayDirection = this.player.direction - this.fov / 2;
         // cast a ray for each viewport pixel
@@ -75,7 +151,7 @@ export class CrawlScene extends Scene {
             // cast ray to find distance to wall
             let d = this.dungeon.castRay(this.player.position, rayDirection);
             // calculate wall height basing on distance
-            let wallHeight = this.getWallHeight(engine, d);
+            let wallHeight = this.getWallHeight(engine.drawHeight, d);
             // TODO correct FOV distortion
             // add vertical line actor
             const wallShade = this.getWallColor(d);
@@ -106,13 +182,13 @@ export class CrawlScene extends Scene {
      * the frame height is returned. Otherwise, the frame height is divided by the distance.
      * @return {number} The calculated wall height.
      */
-    getWallHeight(engine: Engine, distance: number): number {
+    getWallHeight(maxHeight: number, distance: number): number {
         if (distance < 0) {
             return 0;
         } else if (distance <= 1) {
-            return engine.drawHeight;
+            return maxHeight;
         } else {
-            return engine.drawHeight / distance;
+            return maxHeight / distance;
         }
     }
 
@@ -155,7 +231,7 @@ export class CrawlScene extends Scene {
     }
 
 
-    drawBackground(engine: Engine): void {
+    drawBackgroundActors(engine: Engine): void {
         const sky = new Actor({
             pos: new Vector(0, 0),
             width: engine.drawWidth,
