@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node10",
+    "target": "es2018",
+    "module": "ESNext",
+    "sourceMap": true,
+    "outDir": "./dist/",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+    }
+  }
+}
