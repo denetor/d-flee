@@ -97,11 +97,9 @@ export class CrawlScene extends Scene {
             // TODO correct FOV distortion
             const wallShade = this.getWallColor(d);
             // draw wall
+            ctx.fillStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+            ctx.fillRect(x, ctx.canvas.height / 2 - wallHeight / 2, 1, wallHeight);
             ctx.strokeStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
-            ctx.beginPath();
-            ctx.moveTo(x, ctx.canvas.height / 2 - wallHeight / 2);
-            ctx.lineTo(x, ctx.canvas.height / 2 + wallHeight / 2);
-            ctx.stroke();
             // increment ray direction for next pixel
             rayDirection += this.fovStep;
         }
