@@ -4,9 +4,33 @@ This is a barebones [Excalibur](https://excaliburjs.com) game engine starter bui
 
 Check out our [other samples](https://excaliburjs.com/samples) while you build your game or [ask us questions](https://github.com/excaliburjs/Excalibur/discussions).
 
+## Start
+```shell
+nvm use 24
+npm install
+npm run start
+```
+
+
 ## TODO
-- [x] Version 2 with Excalibur canvas for drawing
-- [ ] Version 3 with basic js canvas
+- [x] Hardwired test dungeon
+- [x] Basic graphics
+- [x] Walls collision and out of bounds check
+- [ ] Wall shade depending on orientation
+- [ ] Basic sprites draw
+- [ ] Wall textures
+- [ ] Pavement and ceiling texture
+- [ ] Vertical head movement when walking
+- [ ] ZBuffer to clip sprites partially hidden by walls
+- [ ] Dungeon random generation with cellular automata
+- [ ] Minimap with player and his direction
+- [ ] Clip to display partial minimap
+- [ ] Doors opened by special crystals to be picked up
+- [ ] Enemies
+- [ ] Powerups
+- [ ] Steps sound
+- [ ] Background music
+- [ ] Enemies and effects sounds
 
 ## Get Started
 
