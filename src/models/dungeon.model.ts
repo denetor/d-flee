@@ -23,6 +23,16 @@ export class Dungeon {
     }
 
 
+    getCell(x: number, y: number): number {
+        return this.cells[Math.floor(y) * this.width + Math.floor(x)];
+    }
+
+
+    isInBounds(x: number, y: number): boolean {
+        return x >= 0 && x < this.width && y >= 0 && y < this.height;
+    }
+
+
 
     /**
      * Identifies and returns the entrance cell in a dungeon.

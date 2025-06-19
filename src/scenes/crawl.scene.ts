@@ -64,10 +64,16 @@ export class CrawlScene extends Scene {
 
         // manage key presses
         if (engine.input.keyboard.isHeld(Keys.W)) {
-            this.movePlayer(0.1);
+            const newPos = this.movePlayer(0.1);
+            if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
+                this.player.position = newPos;
+            }
         }
         if (engine.input.keyboard.isHeld(Keys.S)) {
-            this.movePlayer(-0.1);
+            const newPos = this.movePlayer(-0.1);
+            if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
+                this.player.position = newPos;
+            }
         }
         if (engine.input.keyboard.isHeld(Keys.A)) {
             this.rotatePlayer(-2.5);
@@ -249,14 +255,28 @@ export class CrawlScene extends Scene {
     }
 
 
+    /**
+     * Rotates the player's direction by the specified number of degrees.
+     *
+     * @param {number} degrees - The angle in degrees by which to rotate the player's direction.
+     * @return {void} No return value.
+     */
     rotatePlayer(degrees: number): void {
         this.player.direction += degrees * Math.PI / 180;
     }
 
 
-    movePlayer(distance: number): void {
-        this.player.position.x += Math.cos(this.player.direction) * distance;
-        this.player.position.y += Math.sin(this.player.direction) * distance;
+    /**
+     * Moves the player by a specified distance in the current direction.
+     *
+     * @param {number} distance - The distance by which the player should be moved.
+     * @return {Vector} The new position of the player as a Vector object.
+     */
+    movePlayer(distance: number): Vector {
+        const newPosition = new Vector(this.player.position.x, this.player.position.y);
+        newPosition.x += Math.cos(this.player.direction) * distance;
+        newPosition.y += Math.sin(this.player.direction) * distance;
+        return newPosition;
     }
 
 
