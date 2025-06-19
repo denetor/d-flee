@@ -1,8 +1,13 @@
-# Excalibur TypeScript & Webpack Starter
+# Dungeon flee game
 
-This is a barebones [Excalibur](https://excaliburjs.com) game engine starter built using Typescript 4 & Webpack 5. It's a great starting place to jumpstart building your game! This repo is a template and can be used to [create your own repository](https://github.com/excaliburjs/template-ts-webpack/generate) in GitHub.
+Game based on [Excalibur](https://excaliburjs.com) game engine starter, built using Typescript 4 & Webpack 5.
 
-Check out our [other samples](https://excaliburjs.com/samples) while you build your game or [ask us questions](https://github.com/excaliburjs/Excalibur/discussions).
+![Preview of current version](resources/screenshot-v0.1.png)
+
+Crawl in a dungeon, avoid enemies and reach the exit.
+
+Use keys W, A, S, D to move.
+
 
 ## Start
 ```shell

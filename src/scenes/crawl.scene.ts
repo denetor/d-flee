@@ -64,22 +64,22 @@ export class CrawlScene extends Scene {
 
         // manage key presses
         if (engine.input.keyboard.isHeld(Keys.W)) {
-            const newPos = this.movePlayer(0.1);
+            const newPos = this.movePlayer(0.05);
             if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
                 this.player.position = newPos;
             }
         }
         if (engine.input.keyboard.isHeld(Keys.S)) {
-            const newPos = this.movePlayer(-0.1);
+            const newPos = this.movePlayer(-0.05);
             if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
                 this.player.position = newPos;
             }
         }
         if (engine.input.keyboard.isHeld(Keys.A)) {
-            this.rotatePlayer(-2.5);
+            this.rotatePlayer(-1);
         }
         if (engine.input.keyboard.isHeld(Keys.D)) {
-            this.rotatePlayer(2.5);
+            this.rotatePlayer(1);
         }
     }
 
