@@ -13,6 +13,11 @@ export class CrawlScene extends Scene {
     // rendering type
     renderingType: 'exActors' | 'exCanvas' = 'exCanvas';
     exCanvas: Canvas = null as any;
+    // mouse cursor position
+    mousePos: {
+        current: Vector,
+        previous: Vector,
+    }
 
 
     constructor() {
@@ -21,6 +26,10 @@ export class CrawlScene extends Scene {
         this.player = new Player();
         this.player.position = this.dungeon.startPosition;
         this.player.direction = -60 * Math.PI / 180; // in degrees
+        this.mousePos = {
+            current: new Vector(0, 0),
+            previous: new Vector(0, 0),
+        }
     }
 
 
@@ -66,11 +75,28 @@ export class CrawlScene extends Scene {
             }
         }
         if (engine.input.keyboard.isHeld(Keys.A)) {
-            this.rotatePlayer(-1);
+            const newPos = this.strafePlayer(-0.05);
+            if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
+                this.player.position = newPos;
+            }
         }
         if (engine.input.keyboard.isHeld(Keys.D)) {
-            this.rotatePlayer(1);
+            const newPos = this.strafePlayer(0.05);
+            if (this.dungeon.getCell(newPos.x, newPos.y) === 0 && this.dungeon.isInBounds(newPos.x, newPos.y)) {
+                this.player.position = newPos;
+            }
         }
+
+        // manage mouse movement
+        engine.input.pointers.primary.on('move', (evt) => {
+            this.mousePos.previous = this.mousePos.current;
+            this.mousePos.current = new Vector(evt.screenPos.x, evt.screenPos.y);
+            if (this.mousePos.current.x > this.mousePos.previous.x) {
+                this.rotatePlayer(2);
+            } else if (this.mousePos.current.x < this.mousePos.previous.x) {
+                this.rotatePlayer(-2);
+            }
+        });
     }
 
 
@@ -81,7 +107,6 @@ export class CrawlScene extends Scene {
 
 
     drawWallsCanvas(ctx: CanvasRenderingContext2D) {
-        console.log('renderCanvas()');
         // calculate starting angle (direction - half the FOV)
         let rayDirection = this.player.direction - this.fov / 2;
         // cast a ray for each viewport pixel
@@ -219,6 +244,21 @@ export class CrawlScene extends Scene {
         const newPosition = new Vector(this.player.position.x, this.player.position.y);
         newPosition.x += Math.cos(this.player.direction) * distance;
         newPosition.y += Math.sin(this.player.direction) * distance;
+        return newPosition;
+    }
+
+
+    /**
+     * Adjusts the player's position laterally (sideways) based on the given distance.
+     *
+     * @param {number} distance - The distance by which the player should strafe.
+     *                            Positive values strafe to the right, and negative values strafe to the left.
+     * @return {Vector} The new position of the player after strafing.
+     */
+    strafePlayer(distance: number): Vector {
+        const newPosition = new Vector(this.player.position.x, this.player.position.y);
+        newPosition.x += Math.cos(this.player.direction + Math.PI / 2) * distance;
+        newPosition.y += Math.sin(this.player.direction + Math.PI / 2) * distance;
         return newPosition;
     }
 
