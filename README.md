@@ -21,8 +21,9 @@ npm run start
 - [x] Hardwired test dungeon
 - [x] Basic graphics
 - [x] Walls collision and out of bounds check
-- [/] Wall shade depending on orientation
-- [ ] Add mouse horizontal rotation and strafe with A amd D keys
+- [x] Wall shade depending on orientation (with little artifacts)
+- [ ] Wall shade depending on orientation v2 (without artifacts)
+- [ ] Add mouse horizontal rotation and strafe with A and D keys
 - [ ] Correct FOV distortion
 - [ ] Pavement and floor shade depending on distance from viewer
 - [ ] Basic sprites draw

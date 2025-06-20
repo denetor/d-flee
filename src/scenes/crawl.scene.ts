@@ -171,7 +171,7 @@ export class CrawlScene extends Scene {
         color = color.darken(shade);
         // lighten even walls
         if (side === 0 || side === 2) {
-            color = color.lighten(0.25);
+            color = color.lighten(0.5);
         }
 
         return {r: color.r, g: color.g, b: color.b};
