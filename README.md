@@ -21,18 +21,22 @@ npm run start
 - [x] Hardwired test dungeon
 - [x] Basic graphics
 - [x] Walls collision and out of bounds check
-- [ ] Wall shade depending on orientation
+- [/] Wall shade depending on orientation
+- [ ] Add mouse horizontal rotation and strafe with A amd D keys
+- [ ] Correct FOV distortion
+- [ ] Pavement and floor shade depending on distance from viewer
 - [ ] Basic sprites draw
 - [ ] Wall textures
 - [ ] Pavement and ceiling texture
-- [ ] Vertical head movement when walking
+- [ ] Vertical head bobbling when walking
 - [ ] ZBuffer to clip sprites partially hidden by walls
 - [ ] Dungeon random generation with cellular automata
 - [ ] Minimap with player and his direction
 - [ ] Clip to display partial minimap
 - [ ] Doors opened by special crystals to be picked up
 - [ ] Enemies
-- [ ] Powerups
+- [ ] Path calculation for enemies when seeking player
+- [ ] Add an easy powerups system (decide what to enhance, for how much time, ...)
 - [ ] Steps sound
 - [ ] Background music
 - [ ] Enemies and effects sounds

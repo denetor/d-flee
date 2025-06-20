@@ -46,21 +46,11 @@ export class CrawlScene extends Scene {
 
     onPreUpdate(engine: Engine, elapsed: number) {
         super.onPreUpdate(engine, elapsed);
-        if (this.renderingType === 'exActors') {
-            this.renderActors(engine);
-        }
     }
 
 
     onPostUpdate(engine: Engine, elapsed: number) {
         super.onPostUpdate(engine, elapsed);
-
-        if (this.renderingType === 'exActors') {
-            // kill all actors, they will be rebuilt
-            for (const a of this.actors) {
-                a.kill();
-            }
-        }
 
         // manage key presses
         if (engine.input.keyboard.isHeld(Keys.W)) {
@@ -97,15 +87,18 @@ export class CrawlScene extends Scene {
         // cast a ray for each viewport pixel
         for (let x = 0; x < ctx.canvas.width; x++) {
             // cast ray to find distance to wall
-            let d = this.dungeon.castRay(this.player.position, rayDirection);
-            // calculate wall height basing on distance
-            let wallHeight = this.getWallHeight(ctx.canvas.height, d);
-            // TODO correct FOV distortion
-            const wallShade = this.getWallColor(d);
-            // draw wall
-            ctx.fillStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
-            ctx.fillRect(x, ctx.canvas.height / 2 - wallHeight / 2, 1, wallHeight);
-            ctx.strokeStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+            const hitStatus = this.dungeon.castRay(this.player.position, rayDirection);
+            if (hitStatus.hit) {
+                let d = hitStatus.distance;
+                // calculate wall height basing on distance
+                let wallHeight = this.getWallHeight(ctx.canvas.height, d);
+                // TODO correct FOV distortion
+                const wallShade = this.getWallColor(d, hitStatus.side);
+                // draw wall
+                ctx.fillStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+                ctx.fillRect(x, ctx.canvas.height / 2 - wallHeight / 2, 1, wallHeight);
+                ctx.strokeStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+            }
             // increment ray direction for next pixel
             rayDirection += this.fovStep;
         }
@@ -129,55 +122,6 @@ export class CrawlScene extends Scene {
     }
 
 
-
-
-
-    /**
-     * Version 1: no optimizations, render via an actor for each vertical line
-     * @param engine
-     */
-    renderActors(engine: Engine) {
-        this.drawBackgroundActors(engine);
-        this.drawWallsActors(engine);
-    }
-
-
-    /**
-     * Draw walls using raycasting to generate an actor for each vertical line
-     *
-     * @param engine
-     */
-    drawWallsActors(engine: Engine) {
-        // calculate starting angle (direction - half the FOV)
-        let rayDirection = this.player.direction - this.fov / 2;
-        // cast a ray for each viewport pixel
-        for (let x = 0; x < engine.drawWidth; x++) {
-            // cast ray to find distance to wall
-            let d = this.dungeon.castRay(this.player.position, rayDirection);
-            // calculate wall height basing on distance
-            let wallHeight = this.getWallHeight(engine.drawHeight, d);
-            // TODO correct FOV distortion
-            // add vertical line actor
-            const wallShade = this.getWallColor(d);
-            const a = new Actor({
-                pos: vec(x, engine.halfDrawHeight - wallHeight / 2),
-            })
-            a.graphics.anchor = Vector.Zero
-            a.graphics.use(
-                new Line({
-                    start: vec(0, 0),
-                    end: vec(0, wallHeight),
-                    color: Color.fromRGB(wallShade.r, wallShade.g, wallShade.b),
-                    thickness: 1,
-                })
-            )
-            engine.add(a)
-            // increment ray direction for next pixel
-            rayDirection += this.fovStep;
-        }
-    }
-
-
     /**
      * Calculates and returns the wall height based on the given distance.
      *
@@ -198,18 +142,18 @@ export class CrawlScene extends Scene {
 
 
     // fade color basing on distance
-    getWallColor(distance: number): {r: number, g: number, b: number} {
+    getWallColor(distance: number, side: number): {r: number, g: number, b: number} {
         const closeDistance = 1;
         const farDistance = (this.dungeon.height + this.dungeon.width) / 2;
         if (distance <= closeDistance) {
             // return full color
-            return this.getColorShade(0);
+            return this.getColorShade(0, side);
         } else if (distance >= farDistance) {
             // return lightest color
-            return this.getColorShade(1);
+            return this.getColorShade(1, side);
         } else {
             // return interpolated color shade
-            return this.getColorShade(distance / farDistance);
+            return this.getColorShade(distance / farDistance, side);
         }
     }
 
@@ -221,17 +165,16 @@ export class CrawlScene extends Scene {
      0.0: full 'from' color - 1.0: full 'to' color
      * @return {string} The resulting color shade in the format of an RGB string.
      */
-    getColorShade(shade: number): {r: number, g: number, b: number} {
-        const fromR = 192;
-        const fromG = 192;
-        const fromB = 192;
-        const toR = 64;
-        const toG = 64;
-        const toB = 64;
-        const shadeR = fromR + (toR - fromR) * shade;
-        const shadeG = fromG + (toG - fromG) * shade;
-        const shadeB = fromB + (toB - fromB) * shade;
-        return {r: shadeR, g: shadeG, b: shadeB};
+    getColorShade(shade: number, side: number): {r: number, g: number, b: number} {
+        let color: Color = new Color(192, 192, 192);
+        // darken with distance
+        color = color.darken(shade);
+        // lighten even walls
+        if (side === 0 || side === 2) {
+            color = color.lighten(0.25);
+        }
+
+        return {r: color.r, g: color.g, b: color.b};
     }
 
 

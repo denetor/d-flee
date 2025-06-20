@@ -1,4 +1,5 @@
 import {Vector} from "excalibur";
+import {GeometryService} from "@/services/geometry.service";
 
 export class DungeonProperties {
     width?: number;
@@ -90,7 +91,7 @@ export class Dungeon {
      * @param {number} direction The angle of the ray's direction in radians.
      * @return {number} The distance to the first object encountered by the ray, or -1 if no object is hit within the maximum distance.
      */
-    castRay(origin: Vector, direction: number): number {
+    castRay(origin: Vector, direction: number): {hit: boolean, distance: number, side: number} {
         // start at starting point
         let x = origin.x;
         let y = origin.y;
@@ -109,9 +110,9 @@ export class Dungeon {
             hit = this.cells[Math.floor(y)*this.width + Math.floor(x)];
         } while (hit === 0 && rayDistance < this.rayCastMaxDistance && x >= 0 && y >= 0 && x <= this.width && y <= this.height);
         if (hit === 1) {
-            return Math.sqrt((x - origin.x)**2 + (y - origin.y)**2);
+            return {hit: true, distance: Math.sqrt((x - origin.x)**2 + (y - origin.y)**2), side: GeometryService.getSide(origin, new Vector(x, y))};
         } else {
-            return -1;
+            return {hit: false, distance: -1, side: 0};
         }
     }
 
