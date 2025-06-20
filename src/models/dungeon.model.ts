@@ -13,7 +13,7 @@ export class Dungeon {
     height: number = 1;
     cells: number[] = [];
     startPosition: Vector;
-    rayCastIncrement = 0.02;
+    rayCastIncrement = 0.05;
     rayCastMaxDistance = 10;
 
     constructor(properties?: DungeonProperties) {
@@ -99,6 +99,8 @@ export class Dungeon {
         // precalculate single distance increment in the specified direction
         const dx = Math.cos(direction) * this.rayCastIncrement;
         const dy = Math.sin(direction) * this.rayCastIncrement;
+        const dxFine = dx / 50;
+        const dyFine = dy / 50;
         let hit = 0;
         do {
             // increment distance
@@ -110,6 +112,17 @@ export class Dungeon {
             hit = this.cells[Math.floor(y)*this.width + Math.floor(x)];
         } while (hit === 0 && rayDistance < this.rayCastMaxDistance && x >= 0 && y >= 0 && x <= this.width && y <= this.height);
         if (hit === 1) {
+            // first hit. Now start fron previous point and cycle again with finer increments,
+            // to be more precise with the hit point and reduce vertical flickering lines
+            x -= dx;
+            y -= dy;
+            rayDistance -= dx + dy;
+            do {
+                x += dxFine;
+                y += dyFine;
+                rayDistance += dxFine + dyFine;
+                hit = this.cells[Math.floor(y)*this.width + Math.floor(x)];
+            } while (hit === 0 && rayDistance < this.rayCastMaxDistance && x >= 0 && y >= 0 && x <= this.width && y <= this.height);
             return {hit: true, distance: Math.sqrt((x - origin.x)**2 + (y - origin.y)**2), side: GeometryService.getSide(origin, new Vector(x, y))};
         } else {
             return {hit: false, distance: -1, side: 0};
