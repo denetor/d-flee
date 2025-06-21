@@ -126,7 +126,7 @@ export class CrawlScene extends Scene {
         // cast a ray for each viewport pixel
         for (let x = 0; x < ctx.canvas.width; x++) {
             // cast ray to find distance to wall
-            const hitStatus = this.dungeon.castRay(this.player.position, rayDirection);
+            const hitStatus = this.dungeon.castRay(this.player.position, rayDirection, this.player.direction);
             if (hitStatus.hit) {
                 let d = hitStatus.distance;
                 // calculate wall height basing on distance

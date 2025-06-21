@@ -2,7 +2,7 @@
 
 Game based on [Excalibur](https://excaliburjs.com) game engine starter, built using Typescript 4 & Webpack 5.
 
-![Preview of current version](resources/screenshot-v0.2.png)
+![Preview of current version](resources/screenshot-v0.3.png)
 
 Crawl in a dungeon, avoid enemies and reach the exit.
 
@@ -24,12 +24,12 @@ npm run start
 - [x] Wall shade depending on orientation (with little artifacts)
 - [x] Add mouse horizontal rotation and strafe with A and D keys
 - [x] Pavement and floor shade depending on distance from viewer
-- [ ] Correct FOV distortion
-- [ ] Wall shade depending on orientation v2 (without artifacts)
-- [ ] Better mouse movement
+- [x] Correct FOV distortion
 - [ ] Basic sprites draw
 - [ ] Wall textures
 - [ ] Pavement and ceiling texture
+- [ ] Wall shade depending on orientation v2 (without artifacts)
+- [ ] Fix mouse movement
 - [ ] Vertical head bobbling when walking
 - [ ] ZBuffer to clip sprites partially hidden by walls
 - [ ] Dungeon random generation with cellular automata
