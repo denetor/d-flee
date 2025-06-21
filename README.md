@@ -6,7 +6,7 @@ Game based on [Excalibur](https://excaliburjs.com) game engine starter, built us
 
 Crawl in a dungeon, avoid enemies and reach the exit.
 
-Use keys W, A, S, D to move.
+Use keys W, A, S, D and mouse to move.
 
 
 ## Start
@@ -23,7 +23,7 @@ npm run start
 - [x] Walls collision and out of bounds check
 - [x] Wall shade depending on orientation (with little artifacts)
 - [x] Add mouse horizontal rotation and strafe with A and D keys
-- [ ] Pavement and floor shade depending on distance from viewer
+- [x] Pavement and floor shade depending on distance from viewer
 - [ ] Correct FOV distortion
 - [ ] Wall shade depending on orientation v2 (without artifacts)
 - [ ] Better mouse movement

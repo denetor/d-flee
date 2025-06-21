@@ -100,12 +100,26 @@ export class CrawlScene extends Scene {
     }
 
 
+    /**
+     * Renders the canvas by drawing the background and walls elements.
+     *
+     * @param {CanvasRenderingContext2D} ctx - The rendering context for the canvas.
+     * @return {void} Does not return a value.
+     */
     renderCanvas(ctx: CanvasRenderingContext2D) {
         this.drawBackgroundCanvas(ctx);
         this.drawWallsCanvas(ctx);
     }
 
 
+    /**
+     * Draws the walls of the dungeon onto a canvas context by casting rays for each viewport pixel.
+     * This method simulates a 3D rendering effect by calculating wall heights and shading based on
+     * ray-cast collisions in the dungeon.
+     *
+     * @param {CanvasRenderingContext2D} ctx The 2D canvas rendering context where the walls are drawn.
+     * @return {void} This method does not return any value; it directly renders the walls onto the canvas.
+     */
     drawWallsCanvas(ctx: CanvasRenderingContext2D) {
         // calculate starting angle (direction - half the FOV)
         let rayDirection = this.player.direction - this.fov / 2;
@@ -139,10 +153,17 @@ export class CrawlScene extends Scene {
      */
     drawBackgroundCanvas(ctx: CanvasRenderingContext2D): void {
         // upper half: sky
-        ctx.fillStyle = "#87CEFA";
+        const skyGradient = ctx.createLinearGradient(0, 0, 0, ctx.canvas.height / 2 - 1);
+        skyGradient.addColorStop(0, '#87CEFA');
+        skyGradient.addColorStop(1, '#FFFFFF');
+        ctx.fillStyle = skyGradient;
         ctx.fillRect(0, 0, ctx.canvas.width - 1, ctx.canvas.height / 2 - 1);
+
         // lower half: pavement
-        ctx.fillStyle = "#555555";
+        const pavementGradient = ctx.createLinearGradient(0, ctx.canvas.height / 2, 0, ctx.canvas.height - 1);
+        pavementGradient.addColorStop(0, '#101010');
+        pavementGradient.addColorStop(1, '#505050');
+        ctx.fillStyle = pavementGradient;
         ctx.fillRect(0, ctx.canvas.height / 2, ctx.canvas.width - 1, ctx.canvas.height);
     }
 
