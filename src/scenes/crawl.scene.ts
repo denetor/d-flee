@@ -109,6 +109,7 @@ export class CrawlScene extends Scene {
     renderCanvas(ctx: CanvasRenderingContext2D) {
         this.drawBackgroundCanvas(ctx);
         this.drawWallsCanvas(ctx);
+        this.drawScenery(ctx);
     }
 
 
@@ -165,6 +166,12 @@ export class CrawlScene extends Scene {
         pavementGradient.addColorStop(1, '#505050');
         ctx.fillStyle = pavementGradient;
         ctx.fillRect(0, ctx.canvas.height / 2, ctx.canvas.width - 1, ctx.canvas.height);
+    }
+
+
+    drawScenery(ctx: CanvasRenderingContext2D): void {
+        // v1: draw all scenery items without considering hidden items
+        // TODO complete here
     }
 
 

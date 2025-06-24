@@ -1,5 +1,6 @@
 import {Vector} from "excalibur";
 import {GeometryService} from "@/services/geometry.service";
+import {SceneryItem} from "@/models/scenery-item.model";
 
 export class DungeonProperties {
     width?: number;
@@ -15,6 +16,7 @@ export class Dungeon {
     startPosition: Vector;
     rayCastIncrement = 0.05;
     rayCastMaxDistance = 10;
+    scenery: SceneryItem[] = [];
 
     constructor(properties?: DungeonProperties) {
         this.width = properties?.width ?? 1;

@@ -1,5 +1,7 @@
 import {Dungeon} from "@/models/dungeon.model";
 import {Vector} from "excalibur";
+import {SceneryItemType} from "@/scenery-item-type.enum";
+import {SceneryItem} from "@/models/scenery-item.model";
 
 export class DungeonFactory {
     static getTestDungeon(): Dungeon {
@@ -19,6 +21,15 @@ export class DungeonFactory {
             1, 1, 1, 0, 1, 1, 1, 1, 1, 1,
         ];
         d.startPosition = new Vector(3.5, 8.5);
+        d.scenery.push(
+            new SceneryItem(1.5, 5.5, SceneryItemType.barrel)
+        );
+        d.scenery.push(
+            new SceneryItem(3.5, 5.5, SceneryItemType.barrel)
+        );
+        d.scenery.push(
+            new SceneryItem(4.5, 5.5, SceneryItemType.barrel)
+        );
         return d;
     }
 }
