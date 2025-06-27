@@ -25,7 +25,7 @@ npm run start
 - [x] Add mouse horizontal rotation and strafe with A and D keys
 - [x] Pavement and floor shade depending on distance from viewer
 - [x] Correct FOV distortion
-- [ ] Basic sprites draw
+- [\] Basic sprites draw
 - [ ] Wall textures
 - [ ] Pavement and ceiling texture
 - [ ] Wall shade depending on orientation v2 (without artifacts)

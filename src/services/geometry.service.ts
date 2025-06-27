@@ -4,6 +4,32 @@ export class GeometryService {
 
 
     /**
+     * Calculates the angle in radians between two vectors a and b.
+     *
+     * @param {Vector} a - The starting vector with x and y coordinates.
+     * @param {Vector} b - The ending vector with x and y coordinates.
+     * @return {number} The angle in radians between vector a and vector b.
+     */
+    static getAngle(a: Vector, b: Vector): number {
+        return Math.atan2(b.y - a.y, b.x - a.x);
+    }
+
+
+
+    /**
+     * Calculates the Euclidean distance between two vectors.
+     *
+     * @param {Vector} a - The first vector containing x and y coordinates.
+     * @param {Vector} b - The second vector containing x and y coordinates.
+     * @return {number} The distance between the two vectors.
+     */
+    static getDistance(a: Vector, b: Vector): number {
+        return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+    }
+
+
+
+    /**
      *
      * @param observer
      * @param target

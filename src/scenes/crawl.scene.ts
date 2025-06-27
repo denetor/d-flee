@@ -2,6 +2,7 @@ import {Actor, Canvas, Color, Engine, Keys, Line, Scene, vec, Vector} from "exca
 import {DungeonFactory} from "@/factories/dungeon.factory";
 import {Dungeon} from "@/models/dungeon.model";
 import {Player} from "@/models/player.model";
+import {GeometryService} from "@/services/geometry.service";
 
 export class CrawlScene extends Scene {
     dungeon: Dungeon;
@@ -10,8 +11,7 @@ export class CrawlScene extends Scene {
     fov: number = 60 * Math.PI / 180;
     // single FOV increment to span for each frame width pixel
     fovStep: number = 0;
-    // rendering type
-    renderingType: 'exActors' | 'exCanvas' = 'exCanvas';
+    maxRenderingDistance = 999;
     exCanvas: Canvas = null as any;
     // mouse cursor position
     mousePos: {
@@ -37,19 +37,17 @@ export class CrawlScene extends Scene {
         super.onInitialize(engine);
         this.fovStep = this.fov / engine.drawWidth;
 
-        if (this.renderingType === 'exCanvas') {
-            this.exCanvas = new Canvas({
-                height: engine.drawHeight,
-                width: engine.drawWidth,
-                // cache: true,
-                draw: this.renderCanvas.bind(this),
-            });
-            const canvasActor = new Actor({
-                pos: engine.screen.center,
-            });
-            canvasActor.graphics.use(this.exCanvas);
-            engine.add(canvasActor);
-        }
+        this.exCanvas = new Canvas({
+            height: engine.drawHeight,
+            width: engine.drawWidth,
+            // cache: true,
+            draw: this.renderCanvas.bind(this),
+        });
+        const canvasActor = new Actor({
+            pos: engine.screen.center,
+        });
+        canvasActor.graphics.use(this.exCanvas);
+        engine.add(canvasActor);
     }
 
 
@@ -122,22 +120,42 @@ export class CrawlScene extends Scene {
      * @return {void} This method does not return any value; it directly renders the walls onto the canvas.
      */
     drawWallsCanvas(ctx: CanvasRenderingContext2D) {
+        // list all sprites with their distance, remove out-of-FOV items, then sort items from the most distant
+        const sceneryItemsList: any[] = [];
+        for (let sceneryItem of this.dungeon.scenery) {
+            // ignore scenery out of FOV
+            const angle = GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y));
+            if (Math.abs(angle) < this.fov / 2) {
+                const distance = GeometryService.getDistance(this.player.position, new Vector(sceneryItem.x, sceneryItem.y));
+                sceneryItemsList.push({
+                    item: sceneryItem,
+                    distance: distance,
+                    angle: angle,
+                });
+            }
+        }
+        sceneryItemsList.sort((a, b) => a.distance - b.distance);
         // calculate starting angle (direction - half the FOV)
         let rayDirection = this.player.direction - this.fov / 2;
+        // create z-buffer distance array
+        const wallDistance = new Array(ctx.canvas.width).fill(this.maxRenderingDistance);
         // cast a ray for each viewport pixel
         for (let x = 0; x < ctx.canvas.width; x++) {
             // cast ray to find distance to wall
             const hitStatus = this.dungeon.castRay(this.player.position, rayDirection, this.player.direction);
             if (hitStatus.hit) {
                 let d = hitStatus.distance;
+                // add wall distance to z-buffer distance
+                wallDistance[x] = d;
                 // calculate wall height basing on distance
                 let wallHeight = this.getWallHeight(ctx.canvas.height, d);
-                // TODO correct FOV distortion
                 const wallShade = this.getWallColor(d, hitStatus.side);
                 // draw wall
                 ctx.fillStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
                 ctx.fillRect(x, ctx.canvas.height / 2 - wallHeight / 2, 1, wallHeight);
                 ctx.strokeStyle = `rgb(${wallShade.r}, ${wallShade.g}, ${wallShade.b})`;
+                // TODO find sceneryItems with angle=rayDirection and distance < d
+                // TODO if existing, calculate sprite size basing on distance and draw the sprite
             }
             // increment ray direction for next pixel
             rayDirection += this.fovStep;
@@ -171,7 +189,9 @@ export class CrawlScene extends Scene {
 
     drawScenery(ctx: CanvasRenderingContext2D): void {
         // v1: draw all scenery items without considering hidden items
-        // TODO complete here
+        // TODO while
+        // TODO list scenery objects and NPCs and add the distance from viewer
+        // TODO
     }
 
 
@@ -228,26 +248,6 @@ export class CrawlScene extends Scene {
         }
 
         return {r: color.r, g: color.g, b: color.b};
-    }
-
-
-    drawBackgroundActors(engine: Engine): void {
-        const sky = new Actor({
-            pos: new Vector(0, 0),
-            width: engine.drawWidth,
-            height: engine.halfDrawHeight,
-            color: Color.Blue,
-            anchor: new Vector(0, 0),
-        });
-        const ground = new Actor({
-            pos: new Vector(0, engine.halfDrawHeight),
-            width: engine.drawWidth,
-            height: engine.halfDrawHeight,
-            color: Color.Brown,
-            anchor: new Vector(0, 0),
-        });
-        engine.add(sky);
-        engine.add(ground);
     }
 
 
