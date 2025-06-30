@@ -1,9 +1,11 @@
 import { ImageSource, Loader } from "excalibur";
 import swordPath from './images/sword.png'; // Webpack asset/resource loader will find the image path
+import barrelPath from './images/barrel.png';
 
 // It is convenient to put your resources in one place
 export const Resources = {
-  Sword: new ImageSource(swordPath)
+  Sword: new ImageSource(swordPath),
+  Barrel: new ImageSource(barrelPath),
 } as const; // the 'as const' is a neat typescript trick to get strong typing on your resources. 
 // So when you type Resources.Sword -> ImageSource
 

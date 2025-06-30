@@ -43,6 +43,11 @@ npm run start
 - [ ] Background music
 - [ ] Enemies and effects sounds
 
+
+## Resources
+- https://lodev.org/cgtutor/raycasting.html
+- 
+
 ## Publishing
 
 * Run `npm run build:dev` to produce Javascript bundles for debugging in the `dist/` folder
