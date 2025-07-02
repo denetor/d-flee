@@ -194,15 +194,24 @@ export class CrawlScene extends Scene {
                 item: sceneryItem,
                 distance: GeometryService.getDistance(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
                 angle: GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
+                position: new Vector(ctx.canvas.width / 2, ctx.canvas.height / 2),
             })
         }
-        // TODO keep only sceneryItems within FOV
+        // keep only sceneryItems within FOV
         sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle < this.player.direction - this.fov / 2 || sceneryItem.angle > this.player.direction + this.fov / 2)
         // console.log(sceneryItems);
         // sort by distance, decreasing
         sceneryItems.sort((a, b) => a.distance - b.distance);
-        // TODO calculate sprite position basing on angle
-        // TODO calculate sprite size basing on distance and draw the sprite
+        sceneryItems.map((sceneryItem) => {
+            // TODO calculate sprite position basing on angle
+            if (sceneryItem.angle < 0) {
+
+            } else {
+
+            }
+            // TODO calculate sprite size basing on distance and draw the sprite
+        });
+
     }
 
 

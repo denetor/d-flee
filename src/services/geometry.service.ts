@@ -64,4 +64,31 @@ export class GeometryService {
             return 3;
         }
     }
+
+
+    /**
+     * Esegue un'interpolazione lineare tra due valori.
+     * @param start - Il valore iniziale
+     * @param end - Il valore finale
+     * @param t - Il fattore di interpolazione (tra 0 e 1)
+     *
+     * @returns Il valore interpolato
+     * `lerp(0, 100, 0.5)` restituirà 50 (il punto medio)
+     */
+    static lerp(start: number, end: number, t: number): number {
+        return start + (end - start) * t;
+    }
+
+    /**
+     * Normalizza un valore all'interno di un intervallo.
+     * @param value - Il valore da normalizzare
+     * @param min - Il valore minimo dell'intervallo
+     * @param max - Il valore massimo dell'intervallo
+     *
+     * @returns Il valore normalizzato tra 0 e 1
+     * `normalize(50, 0, 100)` restituirà 0.5 (il valore normalizzato)
+     */
+    static normalize(value: number, min: number, max: number): number {
+        return (value - min) / (max - min);
+    }
 }
