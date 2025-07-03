@@ -24,12 +24,12 @@ export class DungeonFactory {
         d.scenery.push(
             new SceneryItem(1.5, 5.5, SceneryItemType.barrel)
         );
-        d.scenery.push(
-            new SceneryItem(3.5, 5.5, SceneryItemType.barrel)
-        );
-        d.scenery.push(
-            new SceneryItem(4.5, 5.5, SceneryItemType.barrel)
-        );
+        // d.scenery.push(
+        //     new SceneryItem(3.5, 6.5, SceneryItemType.barrel)
+        // );
+        // d.scenery.push(
+        //     new SceneryItem(4.5, 6.5, SceneryItemType.barrel)
+        // );
         return d;
     }
 }

@@ -192,26 +192,43 @@ export class CrawlScene extends Scene {
         for (const sceneryItem of this.dungeon.scenery) {
             sceneryItems.push({
                 item: sceneryItem,
+                // distance from player
                 distance: GeometryService.getDistance(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
+                // item angle from player FOV center
                 angle: GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
+                // position of center of the sprite in screen (defaults to screen center)
                 position: new Vector(ctx.canvas.width / 2, ctx.canvas.height / 2),
+                // sprite size
+                size: 1.0,
             })
         }
         // keep only sceneryItems within FOV
-        sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle < this.player.direction - this.fov / 2 || sceneryItem.angle > this.player.direction + this.fov / 2)
+        // console.log(`--------`);
+        // console.log(`FOV: ${this.fov}`);
+        // console.log(`angle: ${sceneryItems[0].angle}`);
+        sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle >= this.player.direction - this.fov / 2 && sceneryItem.angle <= this.player.direction + this.fov / 2);
         // console.log(sceneryItems);
         // sort by distance, decreasing
         sceneryItems.sort((a, b) => a.distance - b.distance);
         sceneryItems.map((sceneryItem) => {
-            // TODO calculate sprite position basing on angle
+            // calculate sprite position basing on angle
             if (sceneryItem.angle < 0) {
-
+                // TODO better calculation
+                sceneryItem.position.x = sceneryItem.position.x - GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
             } else {
-
+                sceneryItem.position.x = sceneryItem.position.x + GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
             }
-            // TODO calculate sprite size basing on distance and draw the sprite
+            // calculate sprite size basing on distance and draw the sprite
+            // sceneryItem.size = this.getWallHeight(1, sceneryItem.distance);
+            // TODO draw the item at the right position/distance
+            ctx.fillStyle = `red`;
+            // ctx.fillRect(0, sceneryItem.position.y - 10, 100, 20);
+            ctx.strokeText('Angle: ' + sceneryItem.angle, 100, 500, 100);
+            ctx.strokeText('Fov:   ' + this.fov, 100, 510, 100);
+            ctx.strokeText('Ratio: ' + Math.abs(sceneryItem.angle) / this.fov, 100, 520, 100);
+            ctx.strokeText('X:     ' + sceneryItem.position.x, 100, 530, 100);
+            // ctx.fillRect(sceneryItem.position.x - 10, sceneryItem.position.y - 10, 20, 20);
         });
-
     }
 
 
