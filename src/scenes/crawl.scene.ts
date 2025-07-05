@@ -3,6 +3,7 @@ import {DungeonFactory} from "@/factories/dungeon.factory";
 import {Dungeon} from "@/models/dungeon.model";
 import {Player} from "@/models/player.model";
 import {GeometryService} from "@/services/geometry.service";
+import {MapService} from "@/services/map.service";
 
 export class CrawlScene extends Scene {
     dungeon: Dungeon;
@@ -25,7 +26,7 @@ export class CrawlScene extends Scene {
         this.dungeon = DungeonFactory.getTestDungeon();
         this.player = new Player();
         this.player.position = this.dungeon.startPosition;
-        this.player.direction = -60 * Math.PI / 180; // in degrees
+        this.player.direction = 270 * Math.PI / 180; // in degrees
         this.mousePos = {
             current: new Vector(0, 0),
             previous: new Vector(0, 0),
@@ -108,6 +109,7 @@ export class CrawlScene extends Scene {
         this.drawBackgroundCanvas(ctx);
         this.drawWallsCanvas(ctx);
         this.drawScenery(ctx);
+        this.drawMap(ctx);
     }
 
 
@@ -194,8 +196,8 @@ export class CrawlScene extends Scene {
                 item: sceneryItem,
                 // distance from player
                 distance: GeometryService.getDistance(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
-                // item angle from player FOV center
-                angle: GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
+                // item angle from player position
+                angleFromPlayer: GeometryService.getAngle(new Vector(sceneryItem.x, sceneryItem.y), this.player.position),
                 // position of center of the sprite in screen (defaults to screen center)
                 position: new Vector(ctx.canvas.width / 2, ctx.canvas.height / 2),
                 // sprite size
@@ -206,27 +208,29 @@ export class CrawlScene extends Scene {
         // console.log(`--------`);
         // console.log(`FOV: ${this.fov}`);
         // console.log(`angle: ${sceneryItems[0].angle}`);
-        sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle >= this.player.direction - this.fov / 2 && sceneryItem.angle <= this.player.direction + this.fov / 2);
+        // sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle >= this.player.direction - this.fov / 2 && sceneryItem.angle <= this.player.direction + this.fov / 2);
         // console.log(sceneryItems);
         // sort by distance, decreasing
         sceneryItems.sort((a, b) => a.distance - b.distance);
         sceneryItems.map((sceneryItem) => {
             // calculate sprite position basing on angle
-            if (sceneryItem.angle < 0) {
+            if (this.player.direction - sceneryItem.angleFromPlayer < 0) {
                 // TODO better calculation
-                sceneryItem.position.x = sceneryItem.position.x - GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
+                sceneryItem.position.x = GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(this.player.direction - sceneryItem.angleFromPlayer) / this.fov);
             } else {
-                sceneryItem.position.x = sceneryItem.position.x + GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
+                // sceneryItem.position.x =  GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
             }
             // calculate sprite size basing on distance and draw the sprite
             // sceneryItem.size = this.getWallHeight(1, sceneryItem.distance);
             // TODO draw the item at the right position/distance
             ctx.fillStyle = `red`;
             // ctx.fillRect(0, sceneryItem.position.y - 10, 100, 20);
-            ctx.strokeText('Angle: ' + sceneryItem.angle, 100, 500, 100);
-            ctx.strokeText('Fov:   ' + this.fov, 100, 510, 100);
-            ctx.strokeText('Ratio: ' + Math.abs(sceneryItem.angle) / this.fov, 100, 520, 100);
-            ctx.strokeText('X:     ' + sceneryItem.position.x, 100, 530, 100);
+            ctx.strokeText('Direction:          ' + GeometryService.rad2degrees(this.player.direction), 100, 490, 100);
+            ctx.strokeText('AngleFromPlayer:    ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer), 100, 500, 100);
+            // ctx.strokeText('AngleFromDirection: ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer + this.player.direction), 100, 510, 100);
+            // // ctx.strokeText('Fov:       ' + GeometryService.rad2degrees(this.fov), 100, 510, 100);
+            // // ctx.strokeText('Ratio:     ' + Math.abs(sceneryItem.angle) / this.fov, 100, 520, 100);
+            // ctx.strokeText('X:                  ' + sceneryItem.position.x, 100, 530, 100);
             // ctx.fillRect(sceneryItem.position.x - 10, sceneryItem.position.y - 10, 20, 20);
         });
     }
@@ -288,6 +292,11 @@ export class CrawlScene extends Scene {
     }
 
 
+    drawMap(ctx: CanvasRenderingContext2D): void {
+        MapService.draw(ctx, this.dungeon, this.player);
+    }
+
+
     /**
      * Rotates the player's direction by the specified number of degrees.
      *
@@ -296,6 +305,11 @@ export class CrawlScene extends Scene {
      */
     rotatePlayer(degrees: number): void {
         this.player.direction += degrees * Math.PI / 180;
+        if (this.player.direction > 2 * Math.PI) {
+            this.player.direction -= 2 * Math.PI;
+        } else if (this.player.direction < 0) {
+            this.player.direction += 2 * Math.PI;
+        }
     }
 
 

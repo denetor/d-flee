@@ -4,14 +4,19 @@ export class GeometryService {
 
 
     /**
-     * Calculates the angle in radians between two vectors a and b.
+     * Calculates the angle in radians of the position b rwspect the position a
      *
      * @param {Vector} a - The starting vector with x and y coordinates.
      * @param {Vector} b - The ending vector with x and y coordinates.
      * @return {number} The angle in radians between vector a and vector b.
      */
     static getAngle(a: Vector, b: Vector): number {
-        return Math.atan2(b.y - a.y, b.x - a.x);
+        return Math.atan2(a.y - b.y, b.x - a.x);
+    }
+
+
+    static rad2degrees(angle: number): number {
+        return angle * 180 / Math.PI;
     }
 
 

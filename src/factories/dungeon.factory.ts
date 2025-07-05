@@ -22,11 +22,11 @@ export class DungeonFactory {
         ];
         d.startPosition = new Vector(3.5, 8.5);
         d.scenery.push(
+            new SceneryItem(4.5, 7.5, SceneryItemType.barrel)
+        );
+        d.scenery.push(
             new SceneryItem(1.5, 5.5, SceneryItemType.barrel)
         );
-        // d.scenery.push(
-        //     new SceneryItem(3.5, 6.5, SceneryItemType.barrel)
-        // );
         // d.scenery.push(
         //     new SceneryItem(4.5, 6.5, SceneryItemType.barrel)
         // );
