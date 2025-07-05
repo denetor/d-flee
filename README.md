@@ -33,7 +33,7 @@ npm run start
 - [ ] Vertical head bobbling when walking
 - [ ] ZBuffer to clip sprites partially hidden by walls
 - [ ] Dungeon random generation with cellular automata
-- [ ] Minimap with player and his direction
+- [x] Minimap with player and his direction
 - [ ] Clip to display partial minimap
 - [ ] Doors opened by special crystals to be picked up
 - [ ] Enemies
