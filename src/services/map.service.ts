@@ -13,11 +13,11 @@ export class MapService {
         //
     }
 
-    static draw(ctx: CanvasRenderingContext2D, dungeon: Dungeon, player: Player ) {
+    static draw(ctx: CanvasRenderingContext2D, dungeon: Dungeon, player: Player, fov: number) {
         MapService.drawBackground(ctx);
         MapService.drawDungeon(ctx, dungeon);
         MapService.drawScenery(ctx, dungeon);
-        MapService.drawPlayer(ctx, player);
+        MapService.drawPlayer(ctx, player, fov);
     }
 
 
@@ -73,12 +73,40 @@ export class MapService {
     }
 
 
-
-    static drawPlayer(ctx: CanvasRenderingContext2D, player: Player) {
+    /**
+     * Renders a player representation on the canvas.
+     *
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context used to draw the player.
+     * @param {Player} player - The player object containing position data for rendering.
+     * @return {void} This method does not return a value.
+     */
+    static drawPlayer(ctx: CanvasRenderingContext2D, player: Player, fov: number) {
+        const playerCanvasPosition = new Vector(
+            player.position.x * MapService.cellWidth,
+            player.position.y * MapService.cellHeight
+        );
         ctx.fillStyle = "red";
-        ctx.fillRect(player.position.x * MapService.cellWidth - MapService.cellWidth / 8, player.position.y * MapService.cellHeight - MapService.cellHeight / 8, MapService.cellWidth / 4, MapService.cellHeight / 4);
+        ctx.fillRect(playerCanvasPosition.x - MapService.cellWidth / 8, playerCanvasPosition.y - MapService.cellHeight / 8, MapService.cellWidth / 4, MapService.cellHeight / 4);
         ctx.fillStyle = "white";
         ctx.font = "10px Arial";
         ctx.fillText(`(${Math.floor(player.position.x * 100) / 100}, ${Math.floor(player.position.y * 100) / 100})`, player.position.x * MapService.cellWidth - MapService.cellWidth / 8, player.position.y * MapService.cellHeight - MapService.cellHeight / 8 + 16);
+        MapService.drawPlayerDirection(ctx, playerCanvasPosition, player.direction, fov);
+    }
+
+
+    static drawPlayerDirection(ctx: CanvasRenderingContext2D, playerCanvasPosition: Vector, direction: number, fov: number): void {
+        const rayLength = 25;
+        ctx.strokeStyle = "white";
+        // player direction
+        ctx.beginPath();
+        ctx.moveTo(playerCanvasPosition.x, playerCanvasPosition.y);
+        ctx.lineTo(playerCanvasPosition.x + Math.cos(direction) * rayLength, playerCanvasPosition.y + Math.sin(direction) * rayLength);
+        ctx.stroke();
+        // player FOV
+        ctx.beginPath();
+        ctx.moveTo(playerCanvasPosition.x + Math.cos(direction-fov/2) * rayLength, playerCanvasPosition.y + Math.sin(direction-fov/2) * rayLength);
+        ctx.lineTo(playerCanvasPosition.x, playerCanvasPosition.y);
+        ctx.lineTo(playerCanvasPosition.x + Math.cos(direction+fov/2) * rayLength, playerCanvasPosition.y + Math.sin(direction+fov/2) * rayLength);
+        ctx.stroke();
     }
 }

@@ -292,8 +292,14 @@ export class CrawlScene extends Scene {
     }
 
 
+    /**
+     * Renders the game map onto the provided canvas context.
+     *
+     * @param {CanvasRenderingContext2D} ctx - The canvas rendering context used to draw the map.
+     * @return {void} This method does not return a value.
+     */
     drawMap(ctx: CanvasRenderingContext2D): void {
-        MapService.draw(ctx, this.dungeon, this.player);
+        MapService.draw(ctx, this.dungeon, this.player, this.fov);
     }
 
 
