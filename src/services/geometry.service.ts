@@ -11,12 +11,23 @@ export class GeometryService {
      * @return {number} The angle in radians between vector a and vector b.
      */
     static getAngle(a: Vector, b: Vector): number {
-        return Math.atan2(a.y - b.y, b.x - a.x);
+        let radians = Math.atan2(b.y - a.y, b.x - a.x);
+        if (radians < 0) {
+            radians += 2 * Math.PI;
+        }
+        return radians;
     }
 
 
+    /**
+     * Converts an angle measured in radians to an approximately equivalent angle in degrees.
+     * The result is rounded to two decimal places.
+     *
+     * @param {number} angle - The angle in radians to be converted to degrees.
+     * @return {number} The angle in degrees, rounded to two decimal places.
+     */
     static rad2degrees(angle: number): number {
-        return angle * 180 / Math.PI;
+        return Math.round(angle * 180 * 100 / Math.PI) / 100;
     }
 
 

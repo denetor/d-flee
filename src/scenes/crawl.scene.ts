@@ -197,18 +197,20 @@ export class CrawlScene extends Scene {
                 // distance from player
                 distance: GeometryService.getDistance(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
                 // item angle from player position
-                angleFromPlayer: GeometryService.getAngle(new Vector(sceneryItem.x, sceneryItem.y), this.player.position),
+                angleFromPlayer: GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
                 // position of center of the sprite in screen (defaults to screen center)
                 position: new Vector(ctx.canvas.width / 2, ctx.canvas.height / 2),
                 // sprite size
                 size: 1.0,
-            })
+            });
+
         }
         // keep only sceneryItems within FOV
         // console.log(`--------`);
         // console.log(`FOV: ${this.fov}`);
         // console.log(`angle: ${sceneryItems[0].angle}`);
-        // sceneryItems = sceneryItems.filter((sceneryItem) => sceneryItem.angle >= this.player.direction - this.fov / 2 && sceneryItem.angle <= this.player.direction + this.fov / 2);
+
+        sceneryItems = sceneryItems.filter((sceneryItem) => Math.abs(sceneryItem.angleFromPlayer - this.player.direction) <= this.fov/2);
         // console.log(sceneryItems);
         // sort by distance, decreasing
         sceneryItems.sort((a, b) => a.distance - b.distance);
@@ -225,9 +227,9 @@ export class CrawlScene extends Scene {
             // TODO draw the item at the right position/distance
             ctx.fillStyle = `red`;
             // ctx.fillRect(0, sceneryItem.position.y - 10, 100, 20);
-            ctx.strokeText('Direction:          ' + GeometryService.rad2degrees(this.player.direction), 100, 490, 100);
-            ctx.strokeText('AngleFromPlayer:    ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer), 100, 500, 100);
-            // ctx.strokeText('AngleFromDirection: ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer + this.player.direction), 100, 510, 100);
+            ctx.strokeText('Direction:          ' + GeometryService.rad2degrees(this.player.direction), 100, 490, 200);
+            ctx.strokeText('AngleFromPlayer:    ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer), 100, 500, 200);
+            ctx.strokeText('AngleFromDirection: ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer - this.player.direction), 100, 510, 200);
             // // ctx.strokeText('Fov:       ' + GeometryService.rad2degrees(this.fov), 100, 510, 100);
             // // ctx.strokeText('Ratio:     ' + Math.abs(sceneryItem.angle) / this.fov, 100, 520, 100);
             // ctx.strokeText('X:                  ' + sceneryItem.position.x, 100, 530, 100);
@@ -297,6 +299,9 @@ export class CrawlScene extends Scene {
      *
      * @param {CanvasRenderingContext2D} ctx - The canvas rendering context used to draw the map.
      * @return {void} This method does not return a value.
+     */
+    /**
+     *
      */
     drawMap(ctx: CanvasRenderingContext2D): void {
         MapService.draw(ctx, this.dungeon, this.player, this.fov);

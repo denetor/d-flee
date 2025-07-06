@@ -94,6 +94,15 @@ export class MapService {
     }
 
 
+    /**
+     * Renders the player's direction and field of view (FOV) on a canvas.
+     *
+     * @param {CanvasRenderingContext2D} ctx - The rendering context of the canvas to draw on.
+     * @param {Vector} playerCanvasPosition - The position of the player on the canvas, represented as a vector.
+     * @param {number} direction - The direction the player is facing, in radians.
+     * @param {number} fov - The field of view angle, in radians.
+     * @return {void} No return value.
+     */
     static drawPlayerDirection(ctx: CanvasRenderingContext2D, playerCanvasPosition: Vector, direction: number, fov: number): void {
         const rayLength = 25;
         ctx.strokeStyle = "white";
