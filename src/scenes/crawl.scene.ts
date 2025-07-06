@@ -4,6 +4,7 @@ import {Dungeon} from "@/models/dungeon.model";
 import {Player} from "@/models/player.model";
 import {GeometryService} from "@/services/geometry.service";
 import {MapService} from "@/services/map.service";
+import { Resources } from "../resources";
 
 export class CrawlScene extends Scene {
     dungeon: Dungeon;
@@ -187,6 +188,10 @@ export class CrawlScene extends Scene {
     }
 
 
+    /**
+     *
+     * @param ctx
+     */
     drawScenery(ctx: CanvasRenderingContext2D): void {
         let sceneryItems: any[] = [];
         // v1: draw all scenery items without considering hidden items
@@ -209,7 +214,7 @@ export class CrawlScene extends Scene {
         // keep only sceneryItems within FOV
         sceneryItems = sceneryItems.filter((sceneryItem) => Math.abs(sceneryItem.angleFromPlayer - this.player.direction) <= this.fov/2);
         // sort by distance, decreasing
-        sceneryItems.sort((a, b) => a.distance - b.distance);
+        sceneryItems.sort((a, b) => b.distance - a.distance);
         // draw each remaining scenery item
         sceneryItems.map((sceneryItem) => {
             // calculate sprite X position basing on angle
@@ -228,7 +233,20 @@ export class CrawlScene extends Scene {
             ctx.strokeText('h:                  ' + sceneryItem.height, 100, 550, 200);
             // TODO draw scenery sprite
             ctx.fillStyle = `blue`;
-            ctx.fillRect(sceneryItem.position.x - 10, ctx.canvas.height / 2 - sceneryItem.height / 2, 20, sceneryItem.height);
+            ctx.fillRect(sceneryItem.position.x - 1, ctx.canvas.height / 2 - sceneryItem.height / 2, 2, sceneryItem.height);
+            const img = Resources.Barrel.image;
+            const scaleFactor = this.getWallHeight(1, sceneryItem.distance);
+            ctx.strokeText('scale:              ' + scaleFactor, 100, 560, 200);
+            const scaledImageSize = new Vector(Resources.Barrel.image.width * scaleFactor, Resources.Barrel.image.height * scaleFactor);
+            // const scaledImageSize = new Vector(
+            //     Resources.Barrel.image.width * scaleFactor,
+            //     GeometryService.normalize(scaleFactor, Resources.Barrel.image.height, ctx.canvas.height),
+            // );
+            ctx.drawImage(
+                img,
+                sceneryItem.position.x - scaledImageSize.x / 2, ctx.canvas.height / 2 - scaledImageSize.y / 2,
+                scaledImageSize.x, scaledImageSize.y,
+                );
         });
     }
 
