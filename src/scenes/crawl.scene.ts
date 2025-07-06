@@ -200,40 +200,35 @@ export class CrawlScene extends Scene {
                 angleFromPlayer: GeometryService.getAngle(this.player.position, new Vector(sceneryItem.x, sceneryItem.y)),
                 // position of center of the sprite in screen (defaults to screen center)
                 position: new Vector(ctx.canvas.width / 2, ctx.canvas.height / 2),
-                // sprite size
-                size: 1.0,
+                // sprite height
+                height: 1.0,
             });
 
         }
-        // keep only sceneryItems within FOV
-        // console.log(`--------`);
-        // console.log(`FOV: ${this.fov}`);
-        // console.log(`angle: ${sceneryItems[0].angle}`);
 
+        // keep only sceneryItems within FOV
         sceneryItems = sceneryItems.filter((sceneryItem) => Math.abs(sceneryItem.angleFromPlayer - this.player.direction) <= this.fov/2);
-        // console.log(sceneryItems);
         // sort by distance, decreasing
         sceneryItems.sort((a, b) => a.distance - b.distance);
+        // draw each remaining scenery item
         sceneryItems.map((sceneryItem) => {
-            // calculate sprite position basing on angle
-            if (this.player.direction - sceneryItem.angleFromPlayer < 0) {
-                // TODO better calculation
-                sceneryItem.position.x = GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(this.player.direction - sceneryItem.angleFromPlayer) / this.fov);
-            } else {
-                // sceneryItem.position.x =  GeometryService.lerp(0, ctx.canvas.width / 2, Math.abs(sceneryItem.angle) / this.fov);
-            }
-            // calculate sprite size basing on distance and draw the sprite
-            // sceneryItem.size = this.getWallHeight(1, sceneryItem.distance);
-            // TODO draw the item at the right position/distance
-            ctx.fillStyle = `red`;
-            // ctx.fillRect(0, sceneryItem.position.y - 10, 100, 20);
+            // calculate sprite X position basing on angle
+            sceneryItem.position.x = GeometryService.lerp(0, ctx.canvas.width, (sceneryItem.angleFromPlayer - this.player.direction + this.fov / 2) / this.fov);
+            // TODO v1: skip all the item if farther than the corresponding zbuffer
+            // calculate sprite height basing on distance and draw the sprite
+            sceneryItem.height = this.getWallHeight(ctx.canvas.height, sceneryItem.distance);
+            // display debug data
+            ctx.font = "10px Courier New";
             ctx.strokeText('Direction:          ' + GeometryService.rad2degrees(this.player.direction), 100, 490, 200);
             ctx.strokeText('AngleFromPlayer:    ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer), 100, 500, 200);
             ctx.strokeText('AngleFromDirection: ' + GeometryService.rad2degrees(sceneryItem.angleFromPlayer - this.player.direction), 100, 510, 200);
-            // // ctx.strokeText('Fov:       ' + GeometryService.rad2degrees(this.fov), 100, 510, 100);
-            // // ctx.strokeText('Ratio:     ' + Math.abs(sceneryItem.angle) / this.fov, 100, 520, 100);
-            // ctx.strokeText('X:                  ' + sceneryItem.position.x, 100, 530, 100);
-            // ctx.fillRect(sceneryItem.position.x - 10, sceneryItem.position.y - 10, 20, 20);
+            ctx.strokeText('Fov:                ' + GeometryService.rad2degrees(this.fov), 100, 520, 200);
+            ctx.strokeText('Angle ratio:        ' + (sceneryItem.angleFromPlayer - this.player.direction + this.fov / 2) / this.fov, 100, 530, 200);
+            ctx.strokeText('X:                  ' + sceneryItem.position.x, 100, 540, 200);
+            ctx.strokeText('h:                  ' + sceneryItem.height, 100, 550, 200);
+            // TODO draw scenery sprite
+            ctx.fillStyle = `blue`;
+            ctx.fillRect(sceneryItem.position.x - 10, ctx.canvas.height / 2 - sceneryItem.height / 2, 20, sceneryItem.height);
         });
     }
 
