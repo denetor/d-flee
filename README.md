@@ -2,7 +2,7 @@
 
 Game based on [Excalibur](https://excaliburjs.com) game engine starter, built using Typescript 4 & Webpack 5.
 
-![Preview of current version](resources/screenshot-v0.3.png)
+![Preview of current version](resources/screenshot-v0.4.png)
 
 Crawl in a dungeon, avoid enemies and reach the exit.
 
